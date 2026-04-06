@@ -11,8 +11,6 @@ function ProductList({ onCartChange, onOpenProduct }) {
   const [filters, setFilters] = useState({
     name: "",
     category: "",
-    minPrice: "",
-    maxPrice: "",
     sort: "",
   });
 
@@ -23,8 +21,6 @@ function ProductList({ onCartChange, onOpenProduct }) {
       const params = {};
       if (filters.name) params.name = filters.name;
       if (filters.category) params.category = filters.category;
-      if (filters.minPrice) params.minPrice = filters.minPrice;
-      if (filters.maxPrice) params.maxPrice = filters.maxPrice;
       if (filters.sort) params.sort = filters.sort;
 
       const response = await api.get("/products", { params });
@@ -54,8 +50,6 @@ function ProductList({ onCartChange, onOpenProduct }) {
     setFilters({
       name: "",
       category: "",
-      minPrice: "",
-      maxPrice: "",
       sort: "",
     });
   };

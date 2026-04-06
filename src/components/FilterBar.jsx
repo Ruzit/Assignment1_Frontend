@@ -24,22 +24,6 @@ function FilterBar({ filters, onFilterChange, onResetFilters }) {
         <option value="Lifestyle">Lifestyle</option>
       </select>
 
-      <input
-        type="number"
-        name="minPrice"
-        placeholder="Min Price"
-        value={filters.minPrice}
-        onChange={onFilterChange}
-      />
-
-      <input
-        type="number"
-        name="maxPrice"
-        placeholder="Max Price"
-        value={filters.maxPrice}
-        onChange={onFilterChange}
-      />
-
       <select name="sort" value={filters.sort} onChange={onFilterChange}>
         <option value="">Sort By</option>
         <option value="price_asc">Price: Low to High</option>
