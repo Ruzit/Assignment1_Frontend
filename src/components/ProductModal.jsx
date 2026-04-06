@@ -42,9 +42,14 @@ function ProductModal({ product, onClose, onCartChange }) {
 
         <div className="modal-content">
           <h2>{product.name}</h2>
-          <p>
-            <strong>Category:</strong> {product.category}
-          </p>
+          <div className="modal-category-row">
+            <strong>Category:</strong>
+            <span
+              className={`category-badge ${product.category.toLowerCase()}`}
+            >
+              {product.category}
+            </span>
+          </div>
           <p>
             <strong>Price:</strong> ${product.price}
           </p>

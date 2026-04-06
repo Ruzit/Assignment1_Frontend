@@ -43,7 +43,9 @@ function ProductCard({ product, onCartChange, onOpenProduct }) {
       </div>
 
       <h3>{product.name}</h3>
-      <p>{product.category}</p>
+      <span className={`category-badge ${product.category.toLowerCase()}`}>
+        {product.category}
+      </span>
       <p>${product.price}</p>
       <p>{product.description}</p>
       <button onClick={handleAddToCart}>Add to Cart</button>
