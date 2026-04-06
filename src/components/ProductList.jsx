@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import ProductCard from "./ProductCard";
 
-function ProductList() {
+function ProductList({ onCartChange }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -30,7 +30,11 @@ function ProductList() {
       <h2>Products</h2>
       <div className="product-grid">
         {products.map((product) => (
-          <ProductCard key={product._id} product={product} />
+          <ProductCard
+            key={product._id}
+            product={product}
+            onCartChange={onCartChange}
+          />
         ))}
       </div>
     </section>
