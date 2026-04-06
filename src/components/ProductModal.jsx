@@ -4,6 +4,14 @@ import api from "../services/api";
 function ProductModal({ product, onClose, onCartChange }) {
   const [imageLoaded, setImageLoaded] = useState(false);
 
+  let imageSrc;
+
+  try {
+    imageSrc = new URL(`../assets/${product.image}`, import.meta.url).href;
+  } catch {
+    imageSrc = "https://via.placeholder.com/200?text=No+Image";
+  }
+
   const handleAddToCart = async () => {
     try {
       await api.post("/cart", {
@@ -29,7 +37,7 @@ function ProductModal({ product, onClose, onCartChange }) {
         <div className="modal-image-wrapper">
           {!imageLoaded && <div className="image-skeleton modal-skeleton" />}
           <img
-            src={product.image}
+            src={imageSrc}
             alt={product.name}
             onLoad={() => setImageLoaded(true)}
             onError={(e) => {

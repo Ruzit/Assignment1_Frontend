@@ -1,6 +1,15 @@
 import api from "../services/api";
 
 function CartItem({ item, onCartChange }) {
+  let imageSrc;
+
+  try {
+    imageSrc = new URL(`../assets/${item.productId.image}`, import.meta.url)
+      .href;
+  } catch {
+    imageSrc = "https://via.placeholder.com/200?text=No+Image";
+  }
+
   const handleIncrease = async () => {
     try {
       await api.put(`/cart/${item._id}`, {
@@ -39,7 +48,7 @@ function CartItem({ item, onCartChange }) {
 
   return (
     <div className="cart-item">
-      <img src={item.productId.image} alt={item.productId.name} />
+      <img src={imageSrc} alt={item.productId.name} />
       <div className="cart-item-details">
         <h4>{item.productId.name}</h4>
         <p>${item.productId.price}</p>

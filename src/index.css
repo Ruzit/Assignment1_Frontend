@@ -400,3 +400,48 @@ body {
   gap: 10px;
   margin-bottom: 12px;
 }
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #111;
+  color: white;
+  padding: 16px 24px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.logo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.cart-icon {
+  position: relative;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background: red;
+  color: white;
+  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 50%;
+  font-weight: bold;
+}

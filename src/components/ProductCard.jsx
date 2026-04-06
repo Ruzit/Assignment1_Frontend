@@ -4,6 +4,14 @@ import api from "../services/api";
 function ProductCard({ product, onCartChange, onOpenProduct }) {
   const [imageLoaded, setImageLoaded] = useState(false);
 
+  let imageSrc;
+
+  try {
+    imageSrc = new URL(`../assets/${product.image}`, import.meta.url).href;
+  } catch {
+    imageSrc = "https://via.placeholder.com/200?text=No+Image";
+  }
+
   const handleAddToCart = async (e) => {
     e.stopPropagation();
 
@@ -30,7 +38,7 @@ function ProductCard({ product, onCartChange, onOpenProduct }) {
         {!imageLoaded && <div className="image-skeleton" />}
 
         <img
-          src={product.image}
+          src={imageSrc}
           alt={product.name}
           onLoad={() => setImageLoaded(true)}
           onError={(e) => {

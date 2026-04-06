@@ -11,7 +11,7 @@ function Cart({ cartUpdated, onCartChange }) {
 
   const fetchCartData = async () => {
     try {
-      setLoading(true);
+      // setLoading(true);
 
       const cartResponse = await api.get("/cart");
       const summaryResponse = await api.get("/cart/summary");
@@ -22,13 +22,15 @@ function Cart({ cartUpdated, onCartChange }) {
     } catch (err) {
       console.error("Cart fetch error:", err);
       setError("Failed to load cart");
-    } finally {
-      setLoading(false);
     }
+    //  finally {
+    //   setLoading(false);
+    // }
   };
 
   useEffect(() => {
     fetchCartData();
+    setLoading(false);
   }, [cartUpdated]);
 
   const handleClearCart = async () => {

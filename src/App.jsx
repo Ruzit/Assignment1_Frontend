@@ -1,33 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Cart from "./components/Cart";
 import Navbar from "./components/Navbar";
 import ProductList from "./components/ProductList";
 import ProductModal from "./components/ProductModal";
-import "./index.css";
+import api from "./services/api";
 
 function App() {
   const [cartUpdated, setCartUpdated] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [cartCount, setCartCount] = useState(0);
 
   const handleCartChange = () => {
     setCartUpdated((prev) => !prev);
   };
 
-  const handleOpenProduct = (product) => {
-    setSelectedProduct(product);
+  const fetchCartCount = async () => {
+    try {
+      const res = await api.get("/cart/summary");
+      setCartCount(res.data.data.totalItems);
+    } catch (err) {
+      console.error("Cart count error:", err);
+    }
   };
 
-  const handleCloseProduct = () => {
-    setSelectedProduct(null);
-  };
+  useEffect(() => {
+    fetchCartCount();
+  }, [cartUpdated]);
 
   return (
     <div className="app">
-      <Navbar />
+      <Navbar cartCount={cartCount} />
+
       <main className="main-layout">
         <ProductList
           onCartChange={handleCartChange}
-          onOpenProduct={handleOpenProduct}
+          onOpenProduct={setSelectedProduct}
         />
         <Cart cartUpdated={cartUpdated} onCartChange={handleCartChange} />
       </main>
@@ -35,7 +42,7 @@ function App() {
       {selectedProduct && (
         <ProductModal
           product={selectedProduct}
-          onClose={handleCloseProduct}
+          onClose={() => setSelectedProduct(null)}
           onCartChange={handleCartChange}
         />
       )}
