@@ -3,21 +3,30 @@ import Cart from "./components/Cart";
 import Navbar from "./components/Navbar";
 import ProductList from "./components/ProductList";
 import ProductModal from "./components/ProductModal";
+import Toast from "./components/Toast";
+import "./index.css";
 import api from "./services/api";
 
 function App() {
   const [cartUpdated, setCartUpdated] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [cartCount, setCartCount] = useState(0);
+  const [toast, setToast] = useState({ message: "", type: "success" });
 
   const handleCartChange = () => {
-    // Toggle a simple flag so dependent components know to refetch cart data.
     setCartUpdated((prev) => !prev);
+  };
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+
+    setTimeout(() => {
+      setToast({ message: "", type: "success" });
+    }, 2500);
   };
 
   const fetchCartCount = async () => {
     try {
-      // Keep the navbar badge in sync with the current cart summary.
       const res = await api.get("/cart/summary");
       setCartCount(res.data.data.totalItems);
     } catch (err) {
@@ -26,7 +35,6 @@ function App() {
   };
 
   useEffect(() => {
-    // Refresh the visible cart count whenever the cart changes anywhere in the app.
     fetchCartCount();
   }, [cartUpdated]);
 
@@ -34,20 +42,27 @@ function App() {
     <div className="app">
       <Navbar cartCount={cartCount} />
 
+      <Toast message={toast.message} type={toast.type} />
+
       <main className="main-layout">
         <ProductList
           onCartChange={handleCartChange}
           onOpenProduct={setSelectedProduct}
+          showToast={showToast}
         />
-        <Cart cartUpdated={cartUpdated} onCartChange={handleCartChange} />
+        <Cart
+          cartUpdated={cartUpdated}
+          onCartChange={handleCartChange}
+          showToast={showToast}
+        />
       </main>
 
       {selectedProduct && (
-        // Render the modal only when a product has been selected from the list.
         <ProductModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
           onCartChange={handleCartChange}
+          showToast={showToast}
         />
       )}
     </div>

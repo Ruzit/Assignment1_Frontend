@@ -3,7 +3,7 @@ import api from "../services/api";
 import FilterBar from "./FilterBar";
 import ProductCard from "./ProductCard";
 
-function ProductList({ onCartChange, onOpenProduct }) {
+function ProductList({ onCartChange, onOpenProduct, showToast }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -96,6 +96,7 @@ function ProductList({ onCartChange, onOpenProduct }) {
               product={product}
               onCartChange={onCartChange}
               onOpenProduct={onOpenProduct}
+              showToast={showToast}
             />
           ))}
         </div>

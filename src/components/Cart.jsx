@@ -3,7 +3,7 @@ import api from "../services/api";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
 
-function Cart({ cartUpdated, onCartChange }) {
+function Cart({ cartUpdated, onCartChange, showToast }) {
   const [cartItems, setCartItems] = useState([]);
   const [summary, setSummary] = useState({ totalItems: 0, totalPrice: 0 });
   const [loading, setLoading] = useState(true);
@@ -39,7 +39,7 @@ function Cart({ cartUpdated, onCartChange }) {
       onCartChange();
     } catch (error) {
       console.error("Clear cart error:", error);
-      alert("Failed to clear cart");
+      showToast("Failed to clear cart", "error");
     }
   };
 
@@ -83,6 +83,7 @@ function Cart({ cartUpdated, onCartChange }) {
                 key={item._id}
                 item={item}
                 onCartChange={onCartChange}
+                showToast={showToast}
               />
             ))}
           </div>

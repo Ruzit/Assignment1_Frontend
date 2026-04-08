@@ -1,16 +1,13 @@
 import { useState } from "react";
 import api from "../services/api";
 
-function ProductCard({ product, onCartChange, onOpenProduct }) {
+function ProductCard({ product, onCartChange, onOpenProduct, showToast }) {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   let imageSrc;
-
   try {
-    // Resolve the product image from the local assets folder when available.
     imageSrc = new URL(`../assets/${product.image}`, import.meta.url).href;
   } catch {
-    // Fall back to a placeholder if the referenced asset does not exist.
     imageSrc = "https://via.placeholder.com/200?text=No+Image";
   }
 
@@ -24,10 +21,10 @@ function ProductCard({ product, onCartChange, onOpenProduct }) {
       });
 
       onCartChange();
-      alert("Item added to cart");
+      showToast("Item added to cart", "success");
     } catch (error) {
       console.error("Add to cart error:", error);
-      alert("Failed to add item to cart");
+      showToast("Failed to add item to cart", "error");
     }
   };
 
@@ -37,7 +34,6 @@ function ProductCard({ product, onCartChange, onOpenProduct }) {
       onClick={() => onOpenProduct(product)}
     >
       <div className="image-container">
-        {/* Keep a skeleton visible until the product image finishes loading. */}
         {!imageLoaded && <div className="image-skeleton" />}
 
         <img
@@ -45,9 +41,7 @@ function ProductCard({ product, onCartChange, onOpenProduct }) {
           alt={product.name}
           onLoad={() => setImageLoaded(true)}
           onError={(e) => {
-            // Replace broken images with a generic placeholder and reveal it immediately.
-            e.target.src =
-              "https://placehold.co/600x400?text=Image+Not+Available";
+            e.target.src = "https://via.placeholder.com/200?text=No+Image";
             setImageLoaded(true);
           }}
           className={imageLoaded ? "loaded" : "hidden"}

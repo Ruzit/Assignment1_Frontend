@@ -1,6 +1,6 @@
 import api from "../services/api";
 
-function CartItem({ item, onCartChange }) {
+function CartItem({ item, onCartChange, showToast }) {
   let imageSrc;
 
   try {
@@ -20,7 +20,7 @@ function CartItem({ item, onCartChange }) {
       onCartChange();
     } catch (error) {
       console.error("Increase quantity error:", error);
-      alert("Failed to update quantity");
+      showToast("Failed to update quantity", "error");
     }
   };
 
@@ -35,7 +35,7 @@ function CartItem({ item, onCartChange }) {
       onCartChange();
     } catch (error) {
       console.error("Decrease quantity error:", error);
-      alert("Failed to update quantity");
+      showToast("Failed to update quantity", "error");
     }
   };
 
@@ -45,7 +45,7 @@ function CartItem({ item, onCartChange }) {
       onCartChange();
     } catch (error) {
       console.error("Delete cart item error:", error);
-      alert("Failed to remove item");
+      showToast("Failed to remove item", "error");
     }
   };
 

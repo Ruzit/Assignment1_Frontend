@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../services/api";
 
-function ProductModal({ product, onClose, onCartChange }) {
+function ProductModal({ product, onClose, onCartChange, showToast }) {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   let imageSrc;
@@ -22,10 +22,10 @@ function ProductModal({ product, onClose, onCartChange }) {
       });
 
       onCartChange();
-      alert("Item added to cart");
+      showToast("Item added to cart", "success");
     } catch (error) {
       console.error("Add to cart error:", error);
-      alert("Failed to add item to cart");
+      showToast("Failed to add item to cart", "error");
     }
   };
 
