@@ -18,6 +18,7 @@ function ProductList({ onCartChange, onOpenProduct }) {
     try {
       setLoading(true);
 
+      // Only send filter values that are currently active to the products API.
       const params = {};
       if (filters.name) params.name = filters.name;
       if (filters.category) params.category = filters.category;
@@ -35,11 +36,13 @@ function ProductList({ onCartChange, onOpenProduct }) {
   };
 
   useEffect(() => {
+    // Refetch products whenever any filter or sort option changes.
     fetchProducts();
   }, [filters]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
+    // Reuse the input/select name attribute to update the matching filter field.
     setFilters((prev) => ({
       ...prev,
       [name]: value,
@@ -83,6 +86,7 @@ function ProductList({ onCartChange, onOpenProduct }) {
       />
 
       {products.length === 0 ? (
+        // Show an empty state when no products match the current filters.
         <p>No products found.</p>
       ) : (
         <div className="product-grid">

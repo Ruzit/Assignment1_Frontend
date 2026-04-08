@@ -11,11 +11,13 @@ function App() {
   const [cartCount, setCartCount] = useState(0);
 
   const handleCartChange = () => {
+    // Toggle a simple flag so dependent components know to refetch cart data.
     setCartUpdated((prev) => !prev);
   };
 
   const fetchCartCount = async () => {
     try {
+      // Keep the navbar badge in sync with the current cart summary.
       const res = await api.get("/cart/summary");
       setCartCount(res.data.data.totalItems);
     } catch (err) {
@@ -24,6 +26,7 @@ function App() {
   };
 
   useEffect(() => {
+    // Refresh the visible cart count whenever the cart changes anywhere in the app.
     fetchCartCount();
   }, [cartUpdated]);
 
@@ -40,6 +43,7 @@ function App() {
       </main>
 
       {selectedProduct && (
+        // Render the modal only when a product has been selected from the list.
         <ProductModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}

@@ -11,8 +11,7 @@ function Cart({ cartUpdated, onCartChange }) {
 
   const fetchCartData = async () => {
     try {
-      // setLoading(true);
-
+      // Load both the individual cart items and the aggregate totals for display.
       const cartResponse = await api.get("/cart");
       const summaryResponse = await api.get("/cart/summary");
 
@@ -29,6 +28,7 @@ function Cart({ cartUpdated, onCartChange }) {
   };
 
   useEffect(() => {
+    // Refresh the cart whenever another part of the app signals a cart update.
     fetchCartData();
     setLoading(false);
   }, [cartUpdated]);
@@ -73,6 +73,7 @@ function Cart({ cartUpdated, onCartChange }) {
       </div>
 
       {cartItems.length === 0 ? (
+        // Show a simple empty state when there are no items in the cart.
         <p>Your cart is empty.</p>
       ) : (
         <>

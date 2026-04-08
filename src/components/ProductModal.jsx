@@ -7,8 +7,10 @@ function ProductModal({ product, onClose, onCartChange }) {
   let imageSrc;
 
   try {
+    // Resolve the selected product image from the local assets folder.
     imageSrc = new URL(`../assets/${product.image}`, import.meta.url).href;
   } catch {
+    // Use a placeholder when the expected asset file is missing.
     imageSrc = "https://via.placeholder.com/200?text=No+Image";
   }
 
@@ -28,6 +30,7 @@ function ProductModal({ product, onClose, onCartChange }) {
   };
 
   return (
+    // Clicking the overlay closes the modal, while clicks inside the panel do not.
     <div className="modal-overlay" onClick={onClose}>
       <div className="product-modal" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close-btn" onClick={onClose}>
@@ -35,12 +38,14 @@ function ProductModal({ product, onClose, onCartChange }) {
         </button>
 
         <div className="modal-image-wrapper">
+          {/* Show a skeleton until the larger product image has loaded. */}
           {!imageLoaded && <div className="image-skeleton modal-skeleton" />}
           <img
             src={imageSrc}
             alt={product.name}
             onLoad={() => setImageLoaded(true)}
             onError={(e) => {
+              // Swap in a fallback image if the modal image fails to load.
               e.target.src = "https://via.placeholder.com/300?text=No+Image";
               setImageLoaded(true);
             }}

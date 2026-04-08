@@ -1,6 +1,7 @@
 function FilterBar({ filters, onFilterChange, onResetFilters }) {
   return (
     <div className="filter-bar">
+      {/* Free-text search updates the shared filter state by product name. */}
       <input
         type="text"
         name="name"
@@ -9,6 +10,7 @@ function FilterBar({ filters, onFilterChange, onResetFilters }) {
         onChange={onFilterChange}
       />
 
+      {/* Category selection narrows the visible products to a single group. */}
       <select
         name="category"
         value={filters.category}
@@ -24,6 +26,7 @@ function FilterBar({ filters, onFilterChange, onResetFilters }) {
         <option value="Lifestyle">Lifestyle</option>
       </select>
 
+      {/* Sorting changes the order of the displayed product list. */}
       <select name="sort" value={filters.sort} onChange={onFilterChange}>
         <option value="">Sort By</option>
         <option value="price_asc">Price: Low to High</option>

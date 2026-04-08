@@ -4,9 +4,11 @@ function CartItem({ item, onCartChange }) {
   let imageSrc;
 
   try {
+    // Use the matching local product image when the asset exists.
     imageSrc = new URL(`../assets/${item.productId.image}`, import.meta.url)
       .href;
   } catch {
+    // Fall back to a placeholder if the image file cannot be resolved.
     imageSrc = "https://via.placeholder.com/200?text=No+Image";
   }
 
@@ -23,6 +25,7 @@ function CartItem({ item, onCartChange }) {
   };
 
   const handleDecrease = async () => {
+    // Prevent quantities from dropping below 1 from the decrement button.
     if (item.quantity === 1) return;
 
     try {
@@ -52,6 +55,7 @@ function CartItem({ item, onCartChange }) {
       <div className="cart-item-details">
         <h4>{item.productId.name}</h4>
         <p>${item.productId.price}</p>
+        {/* Show the running total for this cart line item. */}
         <p>Subtotal: ${item.productId.price * item.quantity}</p>
 
         <div className="quantity-controls">
