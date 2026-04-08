@@ -8,6 +8,7 @@ function ProductList({ onCartChange, onOpenProduct, showToast }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Track the current search, category, and sort selections from the filter bar.
   const [filters, setFilters] = useState({
     name: "",
     category: "",
@@ -50,6 +51,7 @@ function ProductList({ onCartChange, onOpenProduct, showToast }) {
   };
 
   const handleResetFilters = () => {
+    // Restore the default view by clearing every active filter and sort value.
     setFilters({
       name: "",
       category: "",
@@ -90,6 +92,7 @@ function ProductList({ onCartChange, onOpenProduct, showToast }) {
         <p>No products found.</p>
       ) : (
         <div className="product-grid">
+          {/* Render each returned product as an interactive card in the grid. */}
           {products.map((product) => (
             <ProductCard
               key={product._id}

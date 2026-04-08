@@ -11,15 +11,18 @@ function App() {
   const [cartUpdated, setCartUpdated] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [cartCount, setCartCount] = useState(0);
+  // Store the current toast message and style so feedback can be shown globally.
   const [toast, setToast] = useState({ message: "", type: "success" });
 
   const handleCartChange = () => {
+    // Flip this value to trigger cart-related refetches in child components.
     setCartUpdated((prev) => !prev);
   };
 
   const showToast = (message, type = "success") => {
     setToast({ message, type });
 
+    // Clear the toast automatically after a short delay.
     setTimeout(() => {
       setToast({ message: "", type: "success" });
     }, 2500);
@@ -42,9 +45,11 @@ function App() {
     <div className="app">
       <Navbar cartCount={cartCount} />
 
+      {/* Render transient success/error feedback above the main content. */}
       <Toast message={toast.message} type={toast.type} />
 
       <main className="main-layout">
+        {/* Share the same cart update and toast handlers across both main sections. */}
         <ProductList
           onCartChange={handleCartChange}
           onOpenProduct={setSelectedProduct}

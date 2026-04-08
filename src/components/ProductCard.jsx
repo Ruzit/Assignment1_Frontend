@@ -6,12 +6,15 @@ function ProductCard({ product, onCartChange, onOpenProduct, showToast }) {
 
   let imageSrc;
   try {
+    // Resolve the card image from the local assets folder for this product.
     imageSrc = new URL(`../assets/${product.image}`, import.meta.url).href;
   } catch {
+    // Use a placeholder when the asset file cannot be found.
     imageSrc = "https://via.placeholder.com/200?text=No+Image";
   }
 
   const handleAddToCart = async (e) => {
+    // Prevent the card click handler from opening the product modal.
     e.stopPropagation();
 
     try {
@@ -31,9 +34,11 @@ function ProductCard({ product, onCartChange, onOpenProduct, showToast }) {
   return (
     <div
       className="product-card clickable-card"
+      // Clicking anywhere on the card opens the full product details modal.
       onClick={() => onOpenProduct(product)}
     >
       <div className="image-container">
+        {/* Keep a skeleton visible until the product image finishes loading. */}
         {!imageLoaded && <div className="image-skeleton" />}
 
         <img
@@ -41,6 +46,7 @@ function ProductCard({ product, onCartChange, onOpenProduct, showToast }) {
           alt={product.name}
           onLoad={() => setImageLoaded(true)}
           onError={(e) => {
+            // Replace broken image URLs with a generic fallback image.
             e.target.src = "https://via.placeholder.com/200?text=No+Image";
             setImageLoaded(true);
           }}

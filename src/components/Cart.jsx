@@ -35,6 +35,7 @@ function Cart({ cartUpdated, onCartChange, showToast }) {
 
   const handleClearCart = async () => {
     try {
+      // Remove every item from the current cart in a single backend request.
       await api.delete("/cart");
       onCartChange();
     } catch (error) {
@@ -65,6 +66,7 @@ function Cart({ cartUpdated, onCartChange, showToast }) {
     <aside className="cart-section">
       <div className="cart-header">
         <h2>Shopping Cart</h2>
+        {/* Only show the clear action when there is something to remove. */}
         {cartItems.length > 0 && (
           <button className="clear-cart-btn" onClick={handleClearCart}>
             Clear Cart
@@ -78,6 +80,7 @@ function Cart({ cartUpdated, onCartChange, showToast }) {
       ) : (
         <>
           <div className="cart-items">
+            {/* Render one row per cart entry so quantity controls stay item-specific. */}
             {cartItems.map((item) => (
               <CartItem
                 key={item._id}
