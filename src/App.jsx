@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import AdminDashboard from "./components/AdminDashboard";
 import Cart from "./components/Cart";
 import Login from "./components/Login";
 import Navbar from "./components/Navbar";
@@ -84,6 +85,8 @@ function App() {
             />
           )}
         </div>
+      ) : user?.role === "admin" ? (
+        <AdminDashboard showToast={showToast} />
       ) : (
         <>
           <main className="main-layout">
