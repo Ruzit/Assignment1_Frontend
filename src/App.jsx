@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import Cart from "./components/Cart";
+import Login from "./components/Login";
 import Navbar from "./components/Navbar";
 import ProductList from "./components/ProductList";
 import ProductModal from "./components/ProductModal";
+import Register from "./components/Register";
 import Toast from "./components/Toast";
 import "./index.css";
 import api from "./services/api";
@@ -11,24 +13,43 @@ function App() {
   const [cartUpdated, setCartUpdated] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [cartCount, setCartCount] = useState(0);
-  // Store the current toast message and style so feedback can be shown globally.
   const [toast, setToast] = useState({ message: "", type: "success" });
 
-  const handleCartChange = () => {
-    // Flip this value to trigger cart-related refetches in child components.
-    setCartUpdated((prev) => !prev);
-  };
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+
+  const [authMode, setAuthMode] = useState("login");
 
   const showToast = (message, type = "success") => {
     setToast({ message, type });
 
-    // Clear the toast automatically after a short delay.
     setTimeout(() => {
       setToast({ message: "", type: "success" });
     }, 2500);
   };
 
+  const handleCartChange = () => {
+    setCartUpdated((prev) => !prev);
+  };
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+    setCartUpdated((prev) => !prev);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    setCartCount(0);
+    showToast("Logged out successfully", "success");
+  };
+
   const fetchCartCount = async () => {
+    if (!user) return;
+
     try {
       const res = await api.get("/cart/summary");
       setCartCount(res.data.data.totalItems);
@@ -39,36 +60,55 @@ function App() {
 
   useEffect(() => {
     fetchCartCount();
-  }, [cartUpdated]);
+  }, [cartUpdated, user]);
 
   return (
     <div className="app">
-      <Navbar cartCount={cartCount} />
+      <Navbar user={user} cartCount={cartCount} onLogout={handleLogout} />
 
-      {/* Render transient success/error feedback above the main content. */}
       <Toast message={toast.message} type={toast.type} />
 
-      <main className="main-layout">
-        {/* Share the same cart update and toast handlers across both main sections. */}
-        <ProductList
-          onCartChange={handleCartChange}
-          onOpenProduct={setSelectedProduct}
-          showToast={showToast}
-        />
-        <Cart
-          cartUpdated={cartUpdated}
-          onCartChange={handleCartChange}
-          showToast={showToast}
-        />
-      </main>
+      {!user ? (
+        <div className="auth-page">
+          {authMode === "login" ? (
+            <Login
+              onLogin={handleLogin}
+              showToast={showToast}
+              switchToRegister={() => setAuthMode("register")}
+            />
+          ) : (
+            <Register
+              onLogin={handleLogin}
+              showToast={showToast}
+              switchToLogin={() => setAuthMode("login")}
+            />
+          )}
+        </div>
+      ) : (
+        <>
+          <main className="main-layout">
+            <ProductList
+              onCartChange={handleCartChange}
+              onOpenProduct={setSelectedProduct}
+              showToast={showToast}
+            />
 
-      {selectedProduct && (
-        <ProductModal
-          product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
-          onCartChange={handleCartChange}
-          showToast={showToast}
-        />
+            <Cart
+              cartUpdated={cartUpdated}
+              onCartChange={handleCartChange}
+              showToast={showToast}
+            />
+          </main>
+
+          {selectedProduct && (
+            <ProductModal
+              product={selectedProduct}
+              onClose={() => setSelectedProduct(null)}
+              onCartChange={handleCartChange}
+              showToast={showToast}
+            />
+          )}
+        </>
       )}
     </div>
   );
