@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import useDebounce from "../hooks/useDebounce";
 import api from "../services/api";
 import FilterBar from "./FilterBar";
 import ProductCard from "./ProductCard";
@@ -15,13 +16,17 @@ function ProductList({ onCartChange, onOpenProduct, showToast }) {
     sort: "",
   });
 
+  const debouncedName = useDebounce(filters.name, 400);
+
   const fetchProducts = async () => {
     try {
-      setLoading(true);
+      if (products.length === 0) {
+        setLoading(true);
+      }
 
       // Only send filter values that are currently active to the products API.
       const params = {};
-      if (filters.name) params.name = filters.name;
+      if (debouncedName) params.name = debouncedName;
       if (filters.category) params.category = filters.category;
       if (filters.sort) params.sort = filters.sort;
 
@@ -39,7 +44,7 @@ function ProductList({ onCartChange, onOpenProduct, showToast }) {
   useEffect(() => {
     // Refetch products whenever any filter or sort option changes.
     fetchProducts();
-  }, [filters]);
+  }, [debouncedName, filters.category, filters.sort]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -86,6 +91,9 @@ function ProductList({ onCartChange, onOpenProduct, showToast }) {
         onFilterChange={handleFilterChange}
         onResetFilters={handleResetFilters}
       />
+      {filters.name !== debouncedName && (
+        <p className="search-status">Searching...</p>
+      )}
 
       {products.length === 0 ? (
         // Show an empty state when no products match the current filters.

@@ -649,3 +649,8 @@ body {
     flex-direction: column;
   }
 }
+.search-status {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 12px;
+}
