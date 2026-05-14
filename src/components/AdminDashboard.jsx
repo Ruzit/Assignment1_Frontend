@@ -26,6 +26,46 @@ function AdminDashboard({ showToast, currentUser }) {
     }
   };
 
+  useEffect(() => {
+    fetchAdminData();
+  }, []);
+
+  const handleRoleChange = async (userId, newRole) => {
+    try {
+      await api.put(`/admin/users/${userId}/role`, {
+        role: newRole,
+      });
+
+      showToast("User role updated successfully", "success");
+      fetchAdminData();
+    } catch (error) {
+      showToast(
+        error.response?.data?.message || "Failed to update role",
+        "error",
+      );
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this user? Their cart will also be removed.",
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      await api.delete(`/admin/users/${userId}`);
+
+      showToast("User deleted successfully", "success");
+      fetchAdminData();
+    } catch (error) {
+      showToast(
+        error.response?.data?.message || "Failed to delete user",
+        "error",
+      );
+    }
+  };
+
   const handleAdminCartQuantityChange = async (userId, productId, quantity) => {
     if (quantity < 1) return;
 
@@ -59,6 +99,12 @@ function AdminDashboard({ showToast, currentUser }) {
   };
 
   const handleClearUserCart = async (userId) => {
+    const confirmClear = window.confirm(
+      "Are you sure you want to clear this user's cart?",
+    );
+
+    if (!confirmClear) return;
+
     try {
       await api.delete(`/admin/users/${userId}/cart`);
 
@@ -72,33 +118,53 @@ function AdminDashboard({ showToast, currentUser }) {
     }
   };
 
-  const handleRoleChange = async (userId, newRole) => {
-    try {
-      await api.put(`/admin/users/${userId}/role`, {
-        role: newRole,
-      });
+  const totalCartItems = carts.reduce(
+    (sum, cart) =>
+      sum + cart.products.reduce((pSum, item) => pSum + item.quantity, 0),
+    0,
+  );
 
-      showToast("User role updated successfully", "success");
-
-      fetchAdminData();
-    } catch (error) {
-      showToast(
-        error.response?.data?.message || "Failed to update role",
-        "error",
-      );
-    }
-  };
-
-  useEffect(() => {
-    fetchAdminData();
-  }, []);
+  const totalCartValue = carts.reduce(
+    (sum, cart) =>
+      sum +
+      cart.products.reduce(
+        (pSum, item) => pSum + item.quantity * item.productId.price,
+        0,
+      ),
+    0,
+  );
 
   return (
     <section className="admin-dashboard">
-      <div className="admin-header">
+      <div className="admin-top">
         <div>
-          <h2>Admin Dashboard</h2>
-          <p>Manage users and monitor customer shopping carts.</p>
+          <p className="admin-label">Admin Panel</p>
+          <h2>Dashboard</h2>
+          <p className="admin-subtitle">
+            Manage users, roles, and customer shopping carts.
+          </p>
+        </div>
+      </div>
+
+      <div className="admin-stats">
+        <div className="stat-card">
+          <span>Total Users</span>
+          <strong>{users.length}</strong>
+        </div>
+
+        <div className="stat-card">
+          <span>Active Carts</span>
+          <strong>{carts.length}</strong>
+        </div>
+
+        <div className="stat-card">
+          <span>Cart Items</span>
+          <strong>{totalCartItems}</strong>
+        </div>
+
+        <div className="stat-card">
+          <span>Total Cart Value</span>
+          <strong>${totalCartValue}</strong>
         </div>
       </div>
 
@@ -119,30 +185,34 @@ function AdminDashboard({ showToast, currentUser }) {
       </div>
 
       {loading ? (
-        <p>Loading admin data...</p>
+        <div className="admin-panel-card">
+          <p>Loading admin data...</p>
+        </div>
       ) : (
-        <div className="admin-content">
+        <>
           {activeTab === "users" && (
-            <div className="admin-table-card">
-              <h3>All Users</h3>
+            <div className="admin-panel-card">
+              <div className="panel-header">
+                <h3>User Management</h3>
+                <p>View users, update roles, or remove accounts.</p>
+              </div>
 
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                  </tr>
-                </thead>
+              <div className="user-card-grid">
+                {users.map((user) => {
+                  const isCurrentUser = currentUser?.email === user.email;
 
-                <tbody>
-                  {users.map((user) => (
-                    <tr key={user._id}>
-                      <td>{user.name}</td>
-                      <td>{user.email}</td>
-                      <td>
-                        {user.email === currentUser.email ? (
-                          <span className="self-role-label">{user.role}</span>
+                  return (
+                    <div key={user._id} className="user-management-card">
+                      <div>
+                        <h4>{user.name}</h4>
+                        <p>{user.email}</p>
+                      </div>
+
+                      <div className="user-actions">
+                        {isCurrentUser ? (
+                          <span className={`role-badge ${user.role}`}>
+                            {user.role} - You
+                          </span>
                         ) : (
                           <select
                             value={user.role}
@@ -155,81 +225,112 @@ function AdminDashboard({ showToast, currentUser }) {
                             <option value="admin">Admin</option>
                           </select>
                         )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+
+                        <button
+                          className="danger-btn"
+                          onClick={() => handleDeleteUser(user._id)}
+                          disabled={isCurrentUser}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
 
           {activeTab === "carts" && (
-            <div className="admin-table-card">
-              <h3>All User Carts</h3>
+            <div className="admin-panel-card">
+              <div className="panel-header">
+                <h3>User Cart Management</h3>
+                <p>Review and edit customer cart items.</p>
+              </div>
 
               {carts.length === 0 ? (
-                <p>No cart items found.</p>
+                <p>No user carts found.</p>
               ) : (
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>User</th>
-                      <th>Email</th>
-                      <th>Product</th>
-                      <th>Quantity</th>
-                      <th>Total</th>
-                    </tr>
-                  </thead>
+                <div className="cart-admin-list">
+                  {carts.map((cart) => {
+                    const cartTotal = cart.products.reduce(
+                      (sum, item) => sum + item.quantity * item.productId.price,
+                      0,
+                    );
 
-                  <tbody>
-                    {carts.map((cart) =>
-                      cart.products.map((item) => (
-                        <tr key={`${cart._id}-${item.productId._id}`}>
-                          <td>{cart.userId?.name}</td>
-                          <td>{cart.userId?.email}</td>
-                          <td>{item.productId?.name}</td>
-                          <td>
-                            <input
-                              type="number"
-                              min="1"
-                              value={item.quantity}
-                              onChange={(e) =>
-                                handleAdminCartQuantityChange(
-                                  cart.userId._id,
-                                  item.productId._id,
-                                  Number(e.target.value),
-                                )
-                              }
-                            />
-                          </td>
-                          <td>${item.productId?.price * item.quantity}</td>
-                          <td>
+                    return (
+                      <div key={cart._id} className="cart-admin-card">
+                        <div className="cart-admin-header">
+                          <div>
+                            <h4>{cart.userId?.name}</h4>
+                            <p>{cart.userId?.email}</p>
+                          </div>
+
+                          <div className="cart-admin-summary">
+                            <strong>${cartTotal}</strong>
                             <button
+                              className="danger-outline-btn"
                               onClick={() =>
-                                handleRemoveFromUserCart(
-                                  cart.userId._id,
-                                  item.productId._id,
-                                )
+                                handleClearUserCart(cart.userId._id)
                               }
                             >
-                              Remove
+                              Clear Cart
                             </button>
-                          </td>
-                          <button
-                            className="admin-danger-btn"
-                            onClick={() => handleClearUserCart(cart.userId._id)}
-                          >
-                            Clear This User Cart
-                          </button>
-                        </tr>
-                      )),
-                    )}
-                  </tbody>
-                </table>
+                          </div>
+                        </div>
+
+                        {cart.products.length === 0 ? (
+                          <p className="empty-cart-text">Cart is empty.</p>
+                        ) : (
+                          <div className="cart-product-list">
+                            {cart.products.map((item) => (
+                              <div
+                                key={item.productId._id}
+                                className="cart-product-row"
+                              >
+                                <div>
+                                  <strong>{item.productId?.name}</strong>
+                                  <p>${item.productId?.price}</p>
+                                </div>
+
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={item.quantity}
+                                  onChange={(e) =>
+                                    handleAdminCartQuantityChange(
+                                      cart.userId._id,
+                                      item.productId._id,
+                                      Number(e.target.value),
+                                    )
+                                  }
+                                />
+
+                                <p>${item.productId?.price * item.quantity}</p>
+
+                                <button
+                                  className="danger-btn"
+                                  onClick={() =>
+                                    handleRemoveFromUserCart(
+                                      cart.userId._id,
+                                      item.productId._id,
+                                    )
+                                  }
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
           )}
-        </div>
+        </>
       )}
     </section>
   );
