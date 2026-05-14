@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 
-function AdminDashboard({ showToast }) {
+function AdminDashboard({ showToast, currentUser }) {
   const [activeTab, setActiveTab] = useState("users");
   const [users, setUsers] = useState([]);
   const [carts, setCarts] = useState([]);
@@ -72,6 +72,23 @@ function AdminDashboard({ showToast }) {
     }
   };
 
+  const handleRoleChange = async (userId, newRole) => {
+    try {
+      await api.put(`/admin/users/${userId}/role`, {
+        role: newRole,
+      });
+
+      showToast("User role updated successfully", "success");
+
+      fetchAdminData();
+    } catch (error) {
+      showToast(
+        error.response?.data?.message || "Failed to update role",
+        "error",
+      );
+    }
+  };
+
   useEffect(() => {
     fetchAdminData();
   }, []);
@@ -124,9 +141,20 @@ function AdminDashboard({ showToast }) {
                       <td>{user.name}</td>
                       <td>{user.email}</td>
                       <td>
-                        <span className={`role-badge ${user.role}`}>
-                          {user.role}
-                        </span>
+                        {user.email === currentUser.email ? (
+                          <span className="self-role-label">{user.role}</span>
+                        ) : (
+                          <select
+                            value={user.role}
+                            onChange={(e) =>
+                              handleRoleChange(user._id, e.target.value)
+                            }
+                            className="role-select"
+                          >
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                          </select>
+                        )}
                       </td>
                     </tr>
                   ))}

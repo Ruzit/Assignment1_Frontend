@@ -639,6 +639,14 @@ body {
   color: #1d4ed8;
 }
 
+.role-select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: white;
+  font-size: 14px;
+}
+
 @media (max-width: 768px) {
   .admin-dashboard {
     margin: 12px;

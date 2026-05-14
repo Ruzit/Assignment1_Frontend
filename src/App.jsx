@@ -86,7 +86,7 @@ function App() {
           )}
         </div>
       ) : user?.role === "admin" ? (
-        <AdminDashboard showToast={showToast} />
+        <AdminDashboard showToast={showToast} currentUser={user} />
       ) : (
         <>
           <main className="main-layout">
