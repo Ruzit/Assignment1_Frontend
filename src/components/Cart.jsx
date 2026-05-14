@@ -15,7 +15,7 @@ function Cart({ cartUpdated, onCartChange, showToast }) {
       const cartResponse = await api.get("/cart");
       const summaryResponse = await api.get("/cart/summary");
 
-      setCartItems(cartResponse.data.data);
+      setCartItems(cartResponse.data.data.products || []);
       setSummary(summaryResponse.data.data);
       setError("");
     } catch (err) {
@@ -83,7 +83,7 @@ function Cart({ cartUpdated, onCartChange, showToast }) {
             {/* Render one row per cart entry so quantity controls stay item-specific. */}
             {cartItems.map((item) => (
               <CartItem
-                key={item._id}
+                key={item.productId._id}
                 item={item}
                 onCartChange={onCartChange}
                 showToast={showToast}

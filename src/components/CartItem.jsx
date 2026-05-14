@@ -14,7 +14,7 @@ function CartItem({ item, onCartChange, showToast }) {
 
   const handleIncrease = async () => {
     try {
-      await api.put(`/cart/${item._id}`, {
+      await api.put(`/cart/${item.productId._id}`, {
         quantity: item.quantity + 1,
       });
       onCartChange();
@@ -29,7 +29,7 @@ function CartItem({ item, onCartChange, showToast }) {
     if (item.quantity === 1) return;
 
     try {
-      await api.put(`/cart/${item._id}`, {
+      await api.put(`/cart/${item.productId._id}`, {
         quantity: item.quantity - 1,
       });
       onCartChange();
@@ -41,7 +41,7 @@ function CartItem({ item, onCartChange, showToast }) {
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/cart/${item._id}`);
+      await api.delete(`/cart/${item.productId._id}`);
       onCartChange();
     } catch (error) {
       console.error("Delete cart item error:", error);

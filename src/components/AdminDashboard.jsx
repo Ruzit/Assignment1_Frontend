@@ -26,6 +26,52 @@ function AdminDashboard({ showToast }) {
     }
   };
 
+  const handleAdminCartQuantityChange = async (userId, productId, quantity) => {
+    if (quantity < 1) return;
+
+    try {
+      await api.put(`/admin/users/${userId}/cart/${productId}`, {
+        quantity,
+      });
+
+      showToast("User cart updated successfully", "success");
+      fetchAdminData();
+    } catch (error) {
+      showToast(
+        error.response?.data?.message || "Failed to update user cart",
+        "error",
+      );
+    }
+  };
+
+  const handleRemoveFromUserCart = async (userId, productId) => {
+    try {
+      await api.delete(`/admin/users/${userId}/cart/${productId}`);
+
+      showToast("Product removed from user cart", "success");
+      fetchAdminData();
+    } catch (error) {
+      showToast(
+        error.response?.data?.message || "Failed to remove product",
+        "error",
+      );
+    }
+  };
+
+  const handleClearUserCart = async (userId) => {
+    try {
+      await api.delete(`/admin/users/${userId}/cart`);
+
+      showToast("User cart cleared successfully", "success");
+      fetchAdminData();
+    } catch (error) {
+      showToast(
+        error.response?.data?.message || "Failed to clear user cart",
+        "error",
+      );
+    }
+  };
+
   useEffect(() => {
     fetchAdminData();
   }, []);
@@ -108,15 +154,48 @@ function AdminDashboard({ showToast }) {
                   </thead>
 
                   <tbody>
-                    {carts.map((item) => (
-                      <tr key={item._id}>
-                        <td>{item.userId?.name}</td>
-                        <td>{item.userId?.email}</td>
-                        <td>{item.productId?.name}</td>
-                        <td>{item.quantity}</td>
-                        <td>${item.productId?.price * item.quantity}</td>
-                      </tr>
-                    ))}
+                    {carts.map((cart) =>
+                      cart.products.map((item) => (
+                        <tr key={`${cart._id}-${item.productId._id}`}>
+                          <td>{cart.userId?.name}</td>
+                          <td>{cart.userId?.email}</td>
+                          <td>{item.productId?.name}</td>
+                          <td>
+                            <input
+                              type="number"
+                              min="1"
+                              value={item.quantity}
+                              onChange={(e) =>
+                                handleAdminCartQuantityChange(
+                                  cart.userId._id,
+                                  item.productId._id,
+                                  Number(e.target.value),
+                                )
+                              }
+                            />
+                          </td>
+                          <td>${item.productId?.price * item.quantity}</td>
+                          <td>
+                            <button
+                              onClick={() =>
+                                handleRemoveFromUserCart(
+                                  cart.userId._id,
+                                  item.productId._id,
+                                )
+                              }
+                            >
+                              Remove
+                            </button>
+                          </td>
+                          <button
+                            className="admin-danger-btn"
+                            onClick={() => handleClearUserCart(cart.userId._id)}
+                          >
+                            Clear This User Cart
+                          </button>
+                        </tr>
+                      )),
+                    )}
                   </tbody>
                 </table>
               )}
